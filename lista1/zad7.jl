@@ -38,7 +38,7 @@ function draw(x0, n_min, n_max)
     title!("Porównanie wartości dokładnej i przybliżonej") 
     savefig("report/plots/zad7-plot1.png")
 
-    plot(n_vals, diff_vals, legend=false,)
+    plot(n_vals, diff_vals, legend=false)
     title!("Różnica pomiędzy wartością dokładną a przybliżoną")
     xlabel!("n")
     savefig("report/plots/zad7-plot2.png")
