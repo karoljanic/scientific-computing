@@ -32,17 +32,13 @@ function mbisekcji(f, a::Float64, b::Float64, delta::Float64, epsilon::Float64)
         return 0, 0, 0, 1
     end
 
+    it = 1
     e = b - a
-    it = 0
-    while true
+    e = e / 2
+    c = a + e
+    fc = f(c)
+    while abs(b - a) > delta && abs(fc) > epsilon
         it = it + 1
-        e = e / 2
-        c = a + e
-        fc = f(c)
-        if abs(e) < delta || abs(fc) < epsilon
-            return c, fc, it, 0
-        end
-
         if sign(fa) == sign(fc)
             a = c
             fa = fc
@@ -50,7 +46,13 @@ function mbisekcji(f, a::Float64, b::Float64, delta::Float64, epsilon::Float64)
             b = c
             fb = fc
         end
+
+        e = e / 2
+        c = a + e
+        fc = f(c)
     end
+
+    return c, fc, it, 0
 end
 
 
