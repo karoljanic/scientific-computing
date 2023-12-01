@@ -105,16 +105,13 @@ lub rozpatrywany przedział jest wystarczająco mały($\delta$).
                 \State \Return $0, 0, 0, 1$ \Comment{funkcja nie zmienia znaku na zadanym przedziale}
             \EndIf
 
-            \State $e \gets b-a$
-            \State $it \gets 0$
-            \While{true}
+            \State $it \gets 1$
+            \State $e \gets (b-a)/2$
+            \State $c \gets a + e$
+            \State $fc \gets f(c)$
+            \While{$abs(b-a) > \delta \; and \; abs(fc) > \epsilon$}
                 \State $it \gets it+1$
-                \State $e \gets e/2$
-                \State $c \gets a+e$
-                \State $fc \gets f(c)$
-                \If{$abs(e) < \delta \; or \; abs(fc) < \epsilon$}
-                    \State \textbf{return} $c, fc, it, 0$ \Comment{znaleziono pierwiastek z zadaną dokładnością}
-                \EndIf
+
                 \If{$sign(fa) = sign(fc)$}  \Comment{wybieramy podprzedział tak aby zachować różne znaki}
                     \State $a \gets c$
                     \State $fa \gets fc$
@@ -122,7 +119,13 @@ lub rozpatrywany przedział jest wystarczająco mały($\delta$).
                     \State $b \gets c$
                     \State $fb \gets fc$
                 \EndIf
+
+                \State $e \gets e/2$
+                \State $c \gets a+e$
+                \State $fc \gets f(c)$
             \EndWhile
+
+            \State \textbf{return} $c, fc, it, 0$ \Comment{znaleziono pierwiastek z zadaną dokładnością}
         \EndFunction
     \end{algorithmic}
 \end{algorithm}
