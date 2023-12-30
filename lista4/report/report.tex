@@ -1,0 +1,298 @@
+\documentclass{article}
+\usepackage[top=3cm, bottom=3cm, left = 2cm, right = 2cm]{geometry} 
+\geometry{a4paper} 
+\usepackage[T1]{polski}
+\usepackage[utf8]{inputenc}
+\usepackage{titling}
+\usepackage{caption}
+\usepackage{algorithm2e}
+\usepackage[parfill]{parskip}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{pgffor}
+
+\renewcommand\maketitlehooka{\null\mbox{}\vfill}
+\renewcommand\maketitlehookd{\vfill\null}
+
+\SetAlgorithmName{Algorytm}{algorytm}{Lista algorytmów}
+\SetKwInput{KwData}{Dane}
+\SetKwInput{KwResult}{Wynik}
+\SetKwComment{Comment}{/* }{ */}
+
+\title{Obliczenia Naukowe}
+\author{Karol Janic}
+\date{1 grudnia 2023}
+
+\begin{document}
+
+\begin{titlingpage}
+    \maketitle
+\end{titlingpage}
+
+\tableofcontents
+
+\newpage
+
+\section{Wstęp}
+Iterpolacja funkcji za pomocą wielomianu polega na znalezieniu wielomianu $p$ stopnia co najwyżej $n$, 
+który będzie spełniał $p(x_i) = y_i$ dla zadanych punktów $(x_0, y_0), (x_1, y_1), \ldots, (x_n, y_n)$, 
+gdzie $x_i$ dla $i=0, 1, \ldots, n$ są parami różne. Wielomian $p$ można przedstawić jako kombinację liniową 
+$1, x, x^2, \ldots, x^n$. Jednak takie przedstawienie prowadzi do układu równań z macierzą Vandermonde'a 
+co prowadzi do zadania źle uwarunkowanego. Bazę wielomianu można zmienić na $1, (x-x_0), (x-x_0) \cdot (x-x_1), \ldots, (x-x_0) \cdot (x-x_1) \cdot \ldots \cdot (x-x_(n-1))$.
+Wówczas kolejnymi współczynnikami będą ilorazy różnicowe a taka postać wielomianu nosi nazwę postaci Newtona.
+
+\section{Zadanie 1}
+\subsection{Cel}
+Celem zadania jest implementacja metody obliczającej ilorazy różnicowe funkcji $f$ dla zadanych węzłów $x_0, x_1, \ldots, x_n$
+oraz wartości funkcji w tych węzłach $f(x_0), f(x_1), \ldots, f(x_n).$
+
+\subsection{Rozwiązanie}
+Wielomian $p$ postaci:$ \sum_{i=0}^{n} c_i \cdot q_i(x) $, gdzie $c_i$ to ilorazy różnicowe a $q_i(x) = \prod_{i=0}^{i} (x-x_i)$ jest szukanym wielomianem interpolacyjnym, 
+gdy $ \sum_{i=0}^{n} c_i \cdot q_i(x_i) = y_i$ dla $i=0, 1, \ldots, n$. Warunek ten można zapisać w postaci układu równań w formie macierzowej:
+
+\[
+\begin{bmatrix}
+    1 && 0 && \ldots && 0 \\
+    1 && q_1(x_i) && \ldots && 0 \\
+    \vdots && \vdots && \ddots && \vdots \\
+    1 && q_1(x_n) && \ldots && q_n(x_n)
+\end{bmatrix}
+\begin{bmatrix}
+    c_0 \\
+    c_1 \\
+    \vdots \\
+    c_n
+\end{bmatrix}
+=
+\begin{bmatrix}
+    y_0 \\
+    y_1 \\
+    \vdots \\
+    y_n
+\end{bmatrix}
+\]
+
+Rozwiązaniem takiego układu jest:
+\[
+c_k = f[x_0, x_1, \ldots, x_k]
+\] gdzie $f[x_i, x_1, \ldots, x_j]$ jest ilorazem różnicowym opartym na węzłach $x_i, \ldots, x_j$ określonym rekurencyjnie:
+
+\[
+f[x_k] = f(x_k), \quad \quad 0 \leq i \leq n
+\]
+\[
+f[x_i, \ldots, x_j] = \frac{f[x_{i+1}, \ldots, x_j] - f[x_i, \ldots, x_{j-1}]}{x_j - x_i}, \quad \quad 0 \leq i < j \leq n
+\]
+\subsubsection{Opis metody}
+Prosta implementacja polegałaby na stworzeniu dwuwymiarowej tablicy, w której zapisywane byłyby kolejne wartości ilorazów. Warto jednak zauważyć, 
+że szukane są wyłącznie ilorazy różnicowe, gdzie $x_i = x_0$. Zatem złożoność pamięciową można ograniczyć do $O(1)$ poprzez wyznaczanie ilorazów w miejscu.
+Kolejność wyznaczania ilorazów przedstawiona jest poniżej. Łatwo zobaczyć że złożoność obliczeniowa wynosi $O(n^2)$.
+
+\begin{center}
+    \begin{tabular}{c|ccccc}
+        iteracja & $c_0$ & $c_1$ & $c_2$ & $\cdots$ & $c_n$ \\
+        \hline
+        1 & $f[x_0]$ & $f[x_1]$ & $f[x_2]$ & $\cdots$ & $f[x_n]$ \\
+        \hline
+        2 & & $f[x_0, x_1] =$ & $f[x_1, x_2] =$ & & $f[x_{n-1}, x_{n}] =$ \\
+        & & $\frac{f[x_1] + f[x_0]}{x_1 - x_0}$ & $\frac{f[x_1] + f[x_2]}{x_2 - x_1}$ & $\cdots$ & $\frac{f[x_{n-1}] + f[x_n]}{x_{n} - x{n-1}}$ \\
+        \hline
+        3 & & & $f[x_0, x_1, x_2] =$ & & $f[x_{n-2}, x_{n-1}, x_n] =$ \\
+        & & & $\frac{f[x_1, x_2] + f[x_0, x_1]}{x_2 - x_0}$ & $\cdots$ & $\frac{f[x_{n-1}, x_{n}] + f[x_{n-2}, x_{n-1}]}{x_n - x_{n-2}}$ \\
+        \hline
+        $\vdots$ & & & & $\ddots$ & $\vdots$ \\
+        \hline
+        n & & & & & $f[x_0, x_1, \ldots, x_n] =$ \\
+        & & & & & $\frac{f[x_1, \ldots, x_n] + f[x_0, \ldots, x_{n-1}]}{x_n - x_0}$
+    \end{tabular}
+\end{center}
+
+\newpage
+
+\subsubsection{Pseudokod}
+\begin{algorithm}
+    \caption{Algorytm wyznaczania ilorazów różnicowych}
+    \DontPrintSemicolon
+    \KwData{$x, f$}
+    \KwResult{$fx$}
+    $xLen \gets \texttt{length}(x)$\;
+    $fx \gets f$\;
+    
+    \For{$i = 2$ \KwTo $xLen$}{
+        \For{$j = xLen$ \KwSty{downto} $i$}{
+            $fx[j] = \frac{fx[j]-fx[j-1]}{x[j] - x[j-i+1]}$\;
+        }
+    }
+\end{algorithm}
+
+\section{Zadanie 2}
+\subsection{Cel}
+Celem zadania jest implementacja metody wyznaczającej wartość wielomianu zadanego w postaci Newtona dla danego argumentu.
+
+\subsection{Rozwiązanie}
+Zauważmy, że wielomian interpolacyjny można zapisać w nastepujący sposób:
+\begin{gather}
+    \nonumber
+    p(x) = \sum_{i=0}^{n} c_i \cdot q_i(x) = c_0 + \sum_{i=1}^{n} c_i \cdot q_i(x) = c_0 + \sum_{i=1}^{n} c_i \cdot (x-x_0) \cdot \ldots \cdot (x-x_i) = \\
+    \nonumber
+    = c_0 + (c_1 + \sum_{i=2}^{n} c_i \cdot (x-x_1) \cdot \ldots \cdot (x-x_i)) \cdot (x-x_0) = \\
+    \nonumber
+    = c_0 + (c_1 + (c_2 + \sum_{i=3}^{n} c_i \cdot (x-x_2) \cdot \ldots \cdot (x-x_i)) \cdot (x-x_1) ) \cdot (x-x_0) = \ldots
+\end{gather}
+Otrzymujemy zależność, która jest bazą do zastosowania uogólnionego schematu Hornera: $p(x) = w_0(x)$, gdzie:
+\[
+w_n(x) = c_n
+\]
+\[
+w_k(x) = c_k + (x-x_k) \cdot w_{k+1}(x), \quad k=n-1, \ldots, 0
+\]
+
+\subsubsection{Opis metody}
+Stosując wyżej opisaną zależność można zaimplementować metodę wyznaczania wartości wielomianu.
+Złożoność obliczeniowa algorytmu wynosi $O(n)$ a pamięciowa $O(1)$.
+
+\subsubsection{Pseudokod}
+\begin{algorithm}
+    \caption{Algorytm wyznaczania wartości wielomianu w postaci Newtona}
+    \DontPrintSemicolon
+    \KwData{$x, fx, t$}
+    \KwResult{$ft$}
+    $xLen \gets \texttt{length}(x)$\;
+    $ft \gets fx[xLen]$\;
+    
+    \For{$i = xLen-1$ \KwSty{downto} $1$}{
+        $ft \gets fx[i] + (t - x[i]) \cdot ft$
+    }
+\end{algorithm}
+
+\newpage
+
+\section{Zadanie 3}
+\subsection{Cel}
+Celem zadania jest implementacja metody wyznaczającej postać naturalną wielomianu interpolacyjnego danego w postaci Newtona.
+
+\subsection{Rozwiązanie}
+Rozwińmy pierwsze wyrazy zależności otrzymanej w poprzednim zadaniu:
+\[
+    w_n(x) = c_n
+\]
+\[
+    w_{n-1}(x) = c_{n-1} + (x - x_{n-1}) \cdot w_n(x) = c_{n-1} + (x - x_{n-1}) \cdot c_n = c_n \cdot x - x_{n-1} \cdot c_n + c_{n-1} 
+\]
+\[
+    w_{n-2}(x) = c_{n-2} + (x - x_{n-2}) \cdot w_{n-1} = c_{n-2} + (x - x_{n-2}) \cdot (c_{n-1} + (x - x_{n-1}) \cdot c_n) = 
+\]
+\[
+    = c_n \cdot x^2 + (c_{n-1} - (x_{n-1} + x_{n-2}) \cdot c_n) \cdot x - x_{n-2} \cdot (c_{n-1} - x_{n-1} \cdot c_n) + c_{n-2}
+\]
+\[
+    \vdots
+\]
+\subsubsection{Opis metody}
+Łatwo zauważyć, że początkowe współczynniki przy kolejnych potęgach $x_i$ wynoszą $c_i$, gdzie $0 \leq i \leq n$ a następnie pomniejszane są o $x_i \cdot a_{j+1}$, gdzie $i \leq j < n$ a $a_{j+1}$ jest aktualną wartością współczynnika wyznaczoną wcześniej. Zależność ta prowadzi do algorytmu o złożoności obliczeniowej $O(n^2)$ oraz pamięciowej $O(1)$.
+
+
+\subsubsection{Pseudokod}
+\begin{algorithm}
+    \caption{Algorytm wyznaczania postaci naturalnej wielomianu zadanego w postaci Newtona}
+    \DontPrintSemicolon
+    \KwData{$x, fx$}
+    \KwResult{$a$}
+    $xLen \gets \texttt{length}(x)$\;
+    $a \gets fx$\;
+    
+    \For{$i = xLen-1$ \KwSty{downto} $1$}{
+        \For{$j = i$ \KwTo $xLen-1$}{
+            $a[j] \gets a[j] - a[j+1] \cdot x[i]$
+        }
+    }
+\end{algorithm}
+
+\section{Zadanie 4}
+\subsection{Cel}
+Celem zadania jest implementacja metody interpolującej podaną funkcję na zadanym przedziale
+przy pomocy wyżej zaimplentowach metod oraz węzłów zdefiniowanych w nastepujący sposób:
+\[
+    x_k = a + k \cdot h, \quad h = (b - a) / n, \quad k = 0, 1, \ldots, n
+\]
+
+\subsection{Rozwiązanie}
+\subsubsection{Opis metody}
+Metoda interpoluje funkcję a następnie wizualizuje na wykres zadaną funkcję, wyznaczony wielomian interpolujący oraz węzły.
+
+\section{Zadanie 5}
+\subsection{Cel}
+Celem zadania jest przetestowanie zaimplentowanych metod na funkcjach $f_1(x) = e^x$ na przedziale $[0, 1]$ oraz $f_2(x) = x^2 \cdot sin{x}$ na przedziale $[-1, 1]$. 
+Badany jest także wpływ stopnia wielomianu na dokładność interpolacji dobierając go ze zbioru ${\{5, 10, 15\}}$.
+
+\subsection{Rozwiązanie}
+Zwizualizowano interpolację podanych wyżej funkcji oraz zestawiono wyniki wraz z teoretycznymi przewidywaniami błędu interpolacji.
+
+\subsection{Wyniki}
+Wielomiany bardzo dobrze interpolują zadane funkcje $f_1$ oraz $f_2$. Jest to zgodne z teoretyczny przewidywaniami, gdyż błąd interpolacji wyraża się wzorem:
+\[
+    f(x) - p(x) = \frac{1}{(n+1)!}f^{(n+1)}(\zeta_x)\prod_{i=0}^{n}(x - x_i),
+\]
+\[
+    |f_1(x) - p_1(x)| \leq \frac{1}{6!} \cdot e^1 \cdot \prod_{i=0}^{5}|\frac{1}{2} - x_i| \approx 2 \cdot 10^{-6}
+\]
+\[
+    |f_2(x) - p_2(x)| \leq \frac{1}{6!} \cdot (12 \cdot x \cdot cos(x) - (-30 + x^2) \cdot sin(x)) \prod_{i=0}^{5}|0 - x_i| \approx 5 \cdot 10^{-5}
+\]
+gdzie $x \in [a, b]$ oraz $\zeta_x \in (a, b)$.
+
+
+\section{Zadanie 6}
+\subsection{Cel}
+Celem zadania jest przetestowanie zaimplentowanych metod na funkcjach $f_3(x) = |x|$ na przedziale $[-1, 1]$ oraz $f_4(x) = \frac{1}{1 + x^2}$ na przedziale $[-5, 5]$.
+Badany jest także wpływ stopnia wielomianu na dokładność interpolacji dobierając go ze zbioru ${\{5, 10, 15\}}$.
+
+\subsection{Rozwiązanie}
+Zwizualizowano interpolację podanych wyżej funkcji oraz zestawiono wyniki wraz z teoretycznymi przewidywaniami błędu interpolacji.
+
+\subsection{Wyniki}
+W przypadku funkcji $f_3$ wielomian interpolacyjny gorzej interpoluje zadaną funkcję. Wzrost stopnia wielomianu powoduje lepszą dokładność interpolacji w okolicach zera ale pogarsza ją dla argumentów bliżej końców przedziałów. Powodem takiego zachowania może być fakt, że $f_3$ nie jest funkcją różniczkowalną w przeciwieństwie do wielomianu interpolującego.
+
+W przypadku funkcji $f_4$ wielomian interpolacyjny także gorzej interpoluje zadaną funkcję. Wzrost stopnia wielomianu powoduje lepszą dokładność w okolicach środka układu współrzędnych jednak znacząco pogarsza dokładność dla argumentów bliższych końców zadanego przedziału. 
+Jest to efekt Rungego, który polega na pogorszeniu interpolacji pomimo powiększenia stopnia wielomianu interpolującego. Powodem takiego zachowania jest zły dobór węzłów - tj. dobór węzłów w taki sposób aby odległości między nimi były stałe. Dobrowadza to do wniosku, że nie zawsze zwiększenie stopnia wielomianu poprawia dokładność interpolacji. Warto rozważyć inny dobór węzłów.
+
+\newpage
+
+\def \nArray{5, 10, 15}
+
+\foreach \n in \nArray {
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[height=7cm]{../plots/e^x; n=\n.png}
+    \end{figure}
+}
+
+\newpage 
+
+\foreach \n in \nArray {
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[height=7cm]{../plots/x^2sinx; n=\n.png}
+    \end{figure}
+}
+
+\newpage
+
+\foreach \n in \nArray {
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[height=7cm]{../plots/|x|; n=\n.png}
+    \end{figure}
+}
+
+\newpage 
+
+\foreach \n in \nArray {
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[height=7cm]{../plots/frac{1}{1 + x^2}; n=\n.png}
+    \end{figure}
+}
+
+\end{document}

@@ -1,0 +1,28 @@
+\contentsline {section}{\numberline {1}Wstęp}{2}{}%
+\contentsline {section}{\numberline {2}Zadanie 1}{2}{}%
+\contentsline {subsection}{\numberline {2.1}Cel}{2}{}%
+\contentsline {subsection}{\numberline {2.2}Rozwiązanie}{2}{}%
+\contentsline {subsubsection}{\numberline {2.2.1}Opis metody}{2}{}%
+\contentsline {subsubsection}{\numberline {2.2.2}Pseudokod}{3}{}%
+\contentsline {section}{\numberline {3}Zadanie 2}{3}{}%
+\contentsline {subsection}{\numberline {3.1}Cel}{3}{}%
+\contentsline {subsection}{\numberline {3.2}Rozwiązanie}{3}{}%
+\contentsline {subsubsection}{\numberline {3.2.1}Opis metody}{3}{}%
+\contentsline {subsubsection}{\numberline {3.2.2}Pseudokod}{3}{}%
+\contentsline {section}{\numberline {4}Zadanie 3}{4}{}%
+\contentsline {subsection}{\numberline {4.1}Cel}{4}{}%
+\contentsline {subsection}{\numberline {4.2}Rozwiązanie}{4}{}%
+\contentsline {subsubsection}{\numberline {4.2.1}Opis metody}{4}{}%
+\contentsline {subsubsection}{\numberline {4.2.2}Pseudokod}{4}{}%
+\contentsline {section}{\numberline {5}Zadanie 4}{4}{}%
+\contentsline {subsection}{\numberline {5.1}Cel}{4}{}%
+\contentsline {subsection}{\numberline {5.2}Rozwiązanie}{4}{}%
+\contentsline {subsubsection}{\numberline {5.2.1}Opis metody}{4}{}%
+\contentsline {section}{\numberline {6}Zadanie 5}{5}{}%
+\contentsline {subsection}{\numberline {6.1}Cel}{5}{}%
+\contentsline {subsection}{\numberline {6.2}Rozwiązanie}{5}{}%
+\contentsline {subsection}{\numberline {6.3}Wyniki}{5}{}%
+\contentsline {section}{\numberline {7}Zadanie 6}{5}{}%
+\contentsline {subsection}{\numberline {7.1}Cel}{5}{}%
+\contentsline {subsection}{\numberline {7.2}Rozwiązanie}{5}{}%
+\contentsline {subsection}{\numberline {7.3}Wyniki}{5}{}%
