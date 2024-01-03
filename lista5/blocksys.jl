@@ -11,11 +11,11 @@ function gaussianElimination(A::structures.BlockMatrix, b::structures.BlockVecto
     # Outputs:
     #   x - solution vector
     for row in 1:A.n-1
-        rows = structures.getBlockMatrixColBounds(A, row)
+        rows = structures.getBlockMatrixColBounds(A.n, A.l, row)
         for rowBelow in (row+1):rows[2]
             lambda = A[rowBelow, row] / A[row, row]
             A[rowBelow, row] = 0.0
-            cols = structures.getBlockMatrixRowBounds(A, row)
+            cols = structures.getBlockMatrixRowBounds(A.n, A.l, row)
             for col in (row+1):cols[2]
                 A[rowBelow, col] -= lambda * A[row, col]
             end
@@ -27,7 +27,7 @@ function gaussianElimination(A::structures.BlockMatrix, b::structures.BlockVecto
     x[end] = b[end] / A[end, end]
 
     for row in A.n:-1:1
-        cols = structures.getBlockMatrixRowBounds(A, row)
+        cols = structures.getBlockMatrixRowBounds(A.n, A.l, row)
         sum_term = 0.0
         for col in row+1:cols[2]
             sum_term += A[row, col] * x[col]
@@ -46,7 +46,7 @@ function gaussianEliminationWithPartialPivoting(A::structures.ExtendedBlockMatri
     # Outputs:
     #   x - solution vector
     for row in 1:A.n-1
-        rows = structures.getExtendedBlockMatrixColBounds(A, row)
+        rows = structures.getExtendedBlockMatrixColBounds(A.n, A.l, row)
         maxElement = abs(A[row, row])
         maxElementRow = row
         for rowBelow in (row+1):rows[2]
@@ -57,8 +57,9 @@ function gaussianEliminationWithPartialPivoting(A::structures.ExtendedBlockMatri
         end
 
         if maxElementRow != row
-            cols = structures.getExtendedBlockMatrixRowBounds(A, maxElementRow)
-            for col in cols[1]:cols[2]
+            cols1 = structures.getExtendedBlockMatrixRowBounds(A.n, A.l, row)
+            cols2 = structures.getExtendedBlockMatrixRowBounds(A.n, A.l, maxElementRow)
+            for col in min(cols1[1], cols2[1]):max(cols1[2], cols2[2])
                 temp = A[row, col]
                 A[row, col] = A[maxElementRow, col]
                 A[maxElementRow, col] = temp
@@ -67,11 +68,11 @@ function gaussianEliminationWithPartialPivoting(A::structures.ExtendedBlockMatri
             b[row], b[maxElementRow] = b[maxElementRow], b[row]
         end
 
-        rows = structures.getExtendedBlockMatrixColBounds(A, row)
+        rows = structures.getExtendedBlockMatrixColBounds(A.n, A.l, row)
         for rowBelow in (row+1):rows[2]
             lambda = A[rowBelow, row] / A[row, row]
             A[rowBelow, row] = 0.0
-            cols = structures.getExtendedBlockMatrixRowBounds(A, row)
+            cols = structures.getExtendedBlockMatrixRowBounds(A.n, A.l, row)
             for col in (row+1):cols[2]
                 A[rowBelow, col] -= lambda * A[row, col]
             end
@@ -79,11 +80,16 @@ function gaussianEliminationWithPartialPivoting(A::structures.ExtendedBlockMatri
         end
     end
 
+    # println("GE A = ")
+    # structures.printExtendedBlockMatrix(A)
+    # println("GE b = ")
+    # structures.printBlockVector(b)
+
     x = structures.BlockVector{eltype(b)}(A.n, 0.0)
     x[end] = b[end] / A[end, end]
 
     for row in A.n:-1:1
-        cols = structures.getExtendedBlockMatrixRowBounds(A, row)
+        cols = structures.getExtendedBlockMatrixRowBounds(A.n, A.l, row)
         sum_term = 0.0
         for col in row+1:cols[2]
             sum_term += A[row, col] * x[col]
@@ -105,10 +111,10 @@ function luDecomposition!(A::structures.BlockMatrix)
     # Outputs:
     # nothing
     for row in 1:A.n-1
-        rows = structures.getBlockMatrixColBounds(A, row)
+        rows = structures.getBlockMatrixColBounds(A.n, A.l, row)
         for rowBelow in (row+1):rows[2]
             lambda = A[rowBelow, row] / A[row, row]
-            cols = structures.getBlockMatrixRowBounds(A, row)
+            cols = structures.getBlockMatrixRowBounds(A.n, A.l, row)
             for col in row:cols[2]
                 A[rowBelow, col] -= lambda * A[row, col]
             end
@@ -130,7 +136,7 @@ function luDecompositionWithPartialPivoting!(A::structures.ExtendedBlockMatrix)
     permutation = [i for i in 1:A.n]
 
     for row in 1:A.n-1
-        rows = structures.getExtendedBlockMatrixColBounds(A, row)
+        rows = structures.getExtendedBlockMatrixColBounds(A.n, A.l, row)
         maxElement = abs(A[row, row])
         maxElementRow = row
         for rowBelow in (row+1):rows[2]
@@ -143,7 +149,7 @@ function luDecompositionWithPartialPivoting!(A::structures.ExtendedBlockMatrix)
         if maxElementRow != row
             permutation[row], permutation[maxElementRow] = permutation[maxElementRow], permutation[row]
 
-            cols = structures.getExtendedBlockMatrixRowBounds(A, maxElementRow)
+            cols = structures.getExtendedBlockMatrixRowBounds(A.n, A.l, maxElementRow)
             for col in cols[1]:cols[2]
                 temp = A[row, col]
                 A[row, col] = A[maxElementRow, col]
@@ -151,10 +157,10 @@ function luDecompositionWithPartialPivoting!(A::structures.ExtendedBlockMatrix)
             end
         end
 
-        rows = structures.getExtendedBlockMatrixColBounds(A, row)
+        rows = structures.getExtendedBlockMatrixColBounds(A.n, A.l, row)
         for rowBelow in (row+1):rows[2]
             lambda = A[rowBelow, row] / A[row, row]
-            cols = structures.getExtendedBlockMatrixRowBounds(A, row)
+            cols = structures.getExtendedBlockMatrixRowBounds(A.n, A.l, row)
             for col in row:cols[2]
                 A[rowBelow, col] -= lambda * A[row, col]
             end
@@ -175,19 +181,19 @@ function gaussianEliminationWithLU(A::structures.BlockMatrix, b::structures.Bloc
     y = structures.BlockVector{eltype(b)}(A.n, 0.0)
 
     for row in 1:A.n
-        cols = structures.getBlockMatrixRowBounds(A, row)
+        cols = structures.getBlockMatrixRowBounds(A.n, A.l, row)
         sum_term = 0.0
         for col in cols[1]:(row-1)
             sum_term += A[row, col] * y[col]
         end
-        y[row] = (b[row] - sum_term)
+        y[row] = b[row] - sum_term
     end
 
     x = structures.BlockVector{eltype(b)}(A.n, 0.0)
     x[end] = y[end] / A[end, end]
 
     for row in A.n:-1:1
-        cols = structures.getBlockMatrixRowBounds(A, row)
+        cols = structures.getBlockMatrixRowBounds(A.n, A.l, row)
         sum_term = 0.0
         for col in row+1:cols[2]
             sum_term += A[row, col] * x[col]
@@ -210,7 +216,7 @@ function gaussianEliminationWithLUWithPartialPivoting(A::structures.ExtendedBloc
     y = structures.BlockVector{eltype(b)}(A.n, 0.0)
 
     for row in 1:A.n
-        cols = structures.getExtendedBlockMatrixRowBounds(A, row)
+        cols = structures.getExtendedBlockMatrixRowBounds(A.n, A.l, row)
         sum_term = 0.0
         for col in cols[1]:(row-1)
             sum_term += A[row, col] * y[col]
@@ -218,11 +224,16 @@ function gaussianEliminationWithLUWithPartialPivoting(A::structures.ExtendedBloc
         y[row] = (b[permutation[row]] - sum_term)
     end
 
+    # println("LU A = ")
+    # structures.printExtendedBlockMatrix(A)
+    # println("LU y = ")
+    # structures.printBlockVector(y)
+
     x = structures.BlockVector{eltype(b)}(A.n, 0.0)
     x[end] = y[end] / A[end, end]
 
     for row in A.n:-1:1
-        cols = structures.getExtendedBlockMatrixRowBounds(A, row)
+        cols = structures.getExtendedBlockMatrixRowBounds(A.n, A.l, row)
         sum_term = 0.0
         for col in row+1:cols[2]
             sum_term += A[row, col] * x[col]

@@ -1,0 +1,43 @@
+\contentsline {section}{\numberline {1}Wstęp}{2}{}%
+\contentsline {section}{\numberline {2}Metoda eliminacji Gaussa}{2}{}%
+\contentsline {subsection}{\numberline {2.1}Przekształcenie macierzy do postaci trójkątnej górnej}{2}{}%
+\contentsline {subsubsection}{\numberline {2.1.1}Opis metody}{2}{}%
+\contentsline {subsubsection}{\numberline {2.1.2}Wizualiacja działania algorytmu bez wyboru elementu głównego}{3}{}%
+\contentsline {subsubsection}{\numberline {2.1.3}Pseudokod eliminacji bez wyboru elementu głównego}{4}{}%
+\contentsline {subsubsection}{\numberline {2.1.4}Pseudokod eliminacji z wyborem elementu głównego}{4}{}%
+\contentsline {subsection}{\numberline {2.2}Rozwiązanie układu równań na podstawie macierzy trójkątnej górnej}{5}{}%
+\contentsline {subsubsection}{\numberline {2.2.1}Opis metody}{5}{}%
+\contentsline {subsubsection}{\numberline {2.2.2}Pseudokod}{5}{}%
+\contentsline {subsection}{\numberline {2.3}Złożoność obliczeniowa}{5}{}%
+\contentsline {subsection}{\numberline {2.4}Złożoność pamięciowa}{5}{}%
+\contentsline {section}{\numberline {3}Rozkład LU}{5}{}%
+\contentsline {subsection}{\numberline {3.1}Metoda eliminacji Gaussa a rozkład LU}{6}{}%
+\contentsline {subsection}{\numberline {3.2}Trzymanie rozkładu LU w pamięci}{6}{}%
+\contentsline {subsection}{\numberline {3.3}Algorytm rozkładu LU}{6}{}%
+\contentsline {subsection}{\numberline {3.4}Złożoność obliczeniowa i pamięciowa wyznaczenia rozkładu LU}{6}{}%
+\contentsline {subsection}{\numberline {3.5}Rozwiązywanie układu równań na podstawie rozkładu LU}{7}{}%
+\contentsline {subsubsection}{\numberline {3.5.1}Złożoność obliczeniowa rozwiązywania układu równań na podstawie rozkładu LU}{7}{}%
+\contentsline {subsubsection}{\numberline {3.5.2}Złożoność pamięciowa rozwiązywania układu równań na podstawie rozkładu LU}{7}{}%
+\contentsline {subsubsection}{\numberline {3.5.3}Pseudokod rozwiązywania układu równań na podstawie rozkładu LU bez wyboru elementu głównego}{7}{}%
+\contentsline {subsubsection}{\numberline {3.5.4}Pseudokod rozwiązywania układu równań na podstawie rozkładu LU z wyborem elementu głównego}{8}{}%
+\contentsline {subsection}{\numberline {3.6}Zalety użycia rozkładu LU}{8}{}%
+\contentsline {section}{\numberline {4}Dostosowywanie algorytmu eliminacji Gaussa i rozkładu LU}{8}{}%
+\contentsline {subsection}{\numberline {4.1}Struktura macierzy}{8}{}%
+\contentsline {subsubsection}{\numberline {4.1.1}Realizacja struktury macierzy dla wersji bez wyboru elementu głównego}{9}{}%
+\contentsline {subsubsection}{\numberline {4.1.2}Realizacja struktury macierzy dla wersji z wyborem elementu głównego}{9}{}%
+\contentsline {subsection}{\numberline {4.2}Optymalizacja algorytmu eliminacji Gaussa i rozkładu LU}{10}{}%
+\contentsline {subsubsection}{\numberline {4.2.1}Algorytm eliminacji Gaussa}{10}{}%
+\contentsline {subsubsection}{\numberline {4.2.2}Algorytm wyznaczania rozwiązania układu równań}{10}{}%
+\contentsline {subsection}{\numberline {4.3}Złożoność dostosowanego algorytmu eliminacji Gaussa i rozkładu LU}{10}{}%
+\contentsline {subsubsection}{\numberline {4.3.1}Złożoność obliczeniowa}{10}{}%
+\contentsline {subsubsection}{\numberline {4.3.2}Złożoność pamięciowa bez wyboru elementu głównego}{10}{}%
+\contentsline {subsubsection}{\numberline {4.3.3}Złożoność pamięciowa z wyborem elementu głównego}{10}{}%
+\contentsline {subsection}{\numberline {4.4}Szczegóły implementacyjne}{11}{}%
+\contentsline {subsection}{\numberline {4.5}Pseudokod}{11}{}%
+\contentsline {subsubsection}{\numberline {4.5.1}Jak wyznaczyć zakres wierszy z niezerowymi elementami w danej kolumnie?}{11}{}%
+\contentsline {subsubsection}{\numberline {4.5.2}Jak wyznaczyć zakres kolumn z niezerowymi elementami w danym wierszu?}{11}{}%
+\contentsline {subsubsection}{\numberline {4.5.3}Rozkład LU macierzy $A$ bez wyboru elementu głównego}{12}{}%
+\contentsline {subsubsection}{\numberline {4.5.4}Rozkład LU macierzy $A$ z wyborem elementu głównego}{12}{}%
+\contentsline {subsubsection}{\numberline {4.5.5}Rozwiązanie układu równań na podstawie rozkładu LU macierzy $A$ bez wyboru elementu głównego}{13}{}%
+\contentsline {subsubsection}{\numberline {4.5.6}Rozwiązanie układu równań na podstawie rozkładu LU macierzy $A$ z wyborem elementu głównego}{13}{}%
+\contentsline {section}{\numberline {5}Wyniki eksperymentalne}{14}{}%

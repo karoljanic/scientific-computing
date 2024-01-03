@@ -1,0 +1,836 @@
+\documentclass{article}
+\usepackage[top=3cm, bottom=3cm, left = 2cm, right = 2cm]{geometry} 
+\geometry{a4paper} 
+\usepackage[T1]{polski}
+\usepackage[utf8]{inputenc}
+\usepackage{titling}
+\usepackage{caption}
+\usepackage{algorithm2e}
+\usepackage[parfill]{parskip}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{pgffor}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{nicematrix}
+
+
+\renewcommand\maketitlehooka{\null\mbox{}\vfill}
+\renewcommand\maketitlehookd{\vfill\null}
+
+\SetAlgorithmName{Algorytm}{algorytm}{Lista algorytmów}
+\SetKwInput{KwData}{Dane}
+\SetKwInput{KwResult}{Wynik}
+\SetKwComment{Comment}{/* }{ */}
+
+\title{Obliczenia Naukowe}
+\author{Karol Janic}
+\date{30 grudnia 2023}
+
+\begin{document}
+
+\begin{titlingpage}
+    \maketitle
+\end{titlingpage}
+
+\tableofcontents
+
+\newpage
+
+\section{Wstęp}
+Rozwiązanie układu równań liniowych $Ax = b$ jest jednym z podstawowych problemów. Polega na znalezieniu wektora $x$ spełniającego równanie $Ax = b$, gdzie $A$ jest macierzą kwadratową stopnia $n$, a $b$ jest wektorem długości $n$. 
+W przypadku, gdy $A$ jest macierzą nieosobliwą, to układ ma jednoznaczne rozwiązanie. W przypadku, gdy $A$ jest macierzą osobliwą, to układ może mieć nieskończenie wiele rozwiązań lub nie mieć ich wcale.
+
+\section{Metoda eliminacji Gaussa}
+W celu znalezienia rozwiązania równania $Ax=b$ można wykorzystać metodę eliminacji Gaussa, która polega na przekształceniu macierzy $A$ do macierzy trójkątnej górnej, 
+a następnie wyznaczeniu rozwiązania poprzez podstawienia od końca.
+\subsection{Przekształcenie macierzy do postaci trójkątnej górnej}
+\subsubsection{Opis metody}
+Niech $A \in \mathbb{R}^{n \times n}$ będzie macierzą nieosobliwą, czyli $\det(A) \neq 0$ oraz niech $b \in \mathbb{R}^{n}$ będzie wektorem. Pierwszym krokiem jest przekształcenie macierzy $A$ do macierzy trójkątnej górnej poprzez wykonywanie operacji elementarnych na wierszach, czyli:
+\begin{itemize}
+    \item Dodanie do wiersza $i$ wiersza $j$ pomnożonego przez skalar $\alpha \in \mathbb{R}$.
+    \item Pomnożenie wiersza $i$ przez skalar $\alpha \in \mathbb{R}$.
+    \item Zamiana wierszy $i$ i $j$.
+\end{itemize} 
+\begin{center}
+    $$
+    \begin{bmatrix}
+        a_{11} & a_{12} & \dots & a_{1k} & \dots & a_{1n} \\
+        a_{21} & a_{22} & \dots & a_{2k} & \dots & a_{2n} \\
+        \vdots & \vdots & \ddots &\vdots & \ddots & \vdots \\
+        a_{k1} & a_{k2} & \dots & a_{kk} & \dots & a_{kn} \\
+        \vdots & \vdots & \ddots & \vdots & \ddots & \vdots \\
+        a_{n1} & a_{n2} & \dots & a_{nk} & \dots & a_{nn} \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        b_{1} \\
+        b_{2} \\
+        \vdots \\
+        b_{k} \\
+        \vdots \\
+        b_{n} \\
+    \end{bmatrix}
+    \qquad
+    \longrightarrow
+    \qquad
+    \begin{bmatrix}
+        a'_{11} & a'_{12} & \dots & a'_{1k} & \dots & a'_{1n} \\
+        0 & a'_{22} & \dots & a'_{2k} & \dots & a'_{2n} \\
+        \vdots & \vdots & \ddots &\vdots & \ddots & \vdots \\
+        0 & 0 & \dots & a'_{kk} & \dots & a'_{kn} \\
+        \vdots & \vdots & \ddots & \vdots & \ddots & \vdots \\
+        0 & 0 & \dots & 0 & \dots & a'_{nn} \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        b'_{1} \\
+        b'_{2} \\
+        \vdots \\
+        b'_{k} \\
+        \vdots \\
+        b'_{n} \\
+    \end{bmatrix}
+    $$
+\end{center}
+Taką formę macierzy można uzyskać poprzez zerowanie elementów pod przekątną, czyli takich $a_{ij}$, że $i > j$. 
+Jedną z operacji elementarnych jest dodanie do wiersza $i$ wiersza $j$ pomnożonego przez skalar $\alpha \in \mathbb{R}$. Wówczas rozwiązania układu równań nie ulegają zmianie.
+Można zatem dla każdego wiersza $i > j$ wykonać operację dodania do wiersza $i$ wiersza $j$ pomnożonego przez:
+$$\lambda_{ij} = -\frac{a^{(k)}_{ij}}{a^{(k)}_{jj}},$$
+gdzie $j$ jest aktualnie przetwarzanym wierszem a $k$ jest numerem iteracji. W $k$-tej iteracji eliminowane są elementy $a_{ij}$, gdzie $i > k$ a $j = k$.
+Równoczśnie należy zaaktualizować wektor $b$ poprzez dodanie do $i$-tego elementu $b$ $j$-tego elementu $b$ pomnożonego przez $\lambda_{ij}$.
+
+Ponieważ macierz jest nieosobliwa, to $a^{(k)}_{jj} \neq 0$. Jeżeli jednak macierz jest osobliwa to może się zdarzyć, że dla pewnego $k$ i $j$ zachodzi $a^{(k)}_{jj} = 0$. 
+Wówczas na mocy innego przekształcenia elementarnego, zamiany dwóch wierszy, można przekształcić macierz tak, aby $a^{(k)}_{jj} \neq 0$ - jest to tzw. wybór elementu głównego.
+
+Warto zauważyć, że w implementacji algorytmu ważne jest nie tylko aby element $a^{(k)}_{jj}$ był różny od zera, ale również nie był zbyt mały co do wartości bezwzględnej, ponieważ może to prowadzić do powiększenia błędów numerycznych.
+Zatem w implementacji algorytmu można zawsze wybierać takie elementy $a^{(k)}_{j'j}$, że
+$$|a^{(k)}_{j'j}| = \max_{i \geq j} |a^{(k)}_{ij}|$$ i odpowiednio zamieniać wiersze. Równocześnie należy zamieniać elementy wektora $b$.
+
+\subsubsection{Wizualiacja działania algorytmu bez wyboru elementu głównego}
+Macierz początkowa i początkowy wektor prawych stron:
+\begin{center}
+    $$
+    \begin{bmatrix}
+        a^{(1)}_{11} & \dots & a^{(1)}_{1k} & \dots & a^{(1)}_{1n} \\
+        a^{(1)}_{21} & \dots & a^{(1)}_{2k} & \dots & a^{(1)}_{2n} \\
+        \vdots & \ddots &\vdots & \ddots & \vdots \\
+        a^{(1)}_{k1} & \dots & a^{(1)}_{kk} & \dots & a^{(1)}_{kn} \\
+        \vdots & \ddots & \vdots & \ddots & \vdots \\
+        a^{(1)}_{n1} & \dots & a^{(1)}_{nk} & \dots & a^{(1)}_{nn} \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        b^{(1)}_{1} \\
+        b^{(1)}_{2} \\
+        \vdots \\
+        b^{(1)}_{k} \\
+        \vdots \\
+        b^{(1)}_{n} \\
+    \end{bmatrix}
+    $$
+\end{center}
+Pierwsza iteracja:
+\begin{center}
+    $$
+    \begin{bmatrix}
+        a^{(1)}_{11} & \dots & a^{(1)}_{1k} & \dots & a^{(1)}_{1n} \\
+        a^{(1)}_{21} -\frac{a^{(1)}_{21}}{a^{(1)}_{11}} \cdot a^{(1)}_{11} & \dots & a^{(1)}_{2k} -\frac{a^{(1)}_{21}}{a^{(1)}_{11}} \cdot a^{(1)}_{1k} & \dots & a^{(1)}_{2n} -\frac{a^{(1)}_{21}}{a^{(1)}_{11}} \cdot a^{(1)}_{1n} \\
+        \vdots & \ddots &\vdots & \ddots & \vdots \\
+        a^{(1)}_{k1} -\frac{a^{(1)}_{k1}}{a^{(1)}_{11}} \cdot a^{(1)}_{11} & \dots & a^{(1)}_{kk} -\frac{a^{(1)}_{k1}}{a^{(1)}_{11}} \cdot a^{(1)}_{1k} & \dots & a^{(1)}_{kn} -\frac{a^{(1)}_{k1}}{a^{(1)}_{11}} \cdot a^{(1)}_{1n} \\
+        \vdots & \ddots & \vdots & \ddots & \vdots \\
+        a^{(1)}_{n1} -\frac{a^{(1)}_{n1}}{a^{(1)}_{11}} \cdot a^{(1)}_{11} &  \dots & a^{(1)}_{nk} -\frac{a^{(1)}_{n1}}{a^{(1)}_{11}} \cdot a^{(1)}_{1k} & \dots & a^{(1)}_{nn} -\frac{a^{(1)}_{n1}}{a^{(1)}_{11}} \cdot a^{(1)}_{1n} \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        b^{(1)}_{1} \\
+        b^{(1)}_{2} -\frac{a^{(1)}_{21}}{a^{(1)}_{11}} \cdot b^{(1)}_{1} \\
+        \vdots \\
+        b^{(1)}_{k} -\frac{a^{(1)}_{k1}}{a^{(1)}_{11}} \cdot b^{(1)}_{1} \\
+        \vdots \\
+        b^{(1)}_{n} -\frac{a^{(1)}_{n1}}{a^{(1)}_{11}} \cdot b^{(1)}_{1} \\
+    \end{bmatrix}
+    =
+    $$
+    $$
+    =
+    \begin{bmatrix}
+        a^{(1)}_{11} & \dots & a^{(1)}_{1k} & \dots & a^{(1)}_{1n} \\
+        0 & \dots & a^{(2)}_{2k} & \dots & a^{(2)}_{2n} \\
+        \vdots & \ddots &\vdots & \ddots & \vdots \\
+        0  & \dots & a^{(2)}_{kk} & \dots & a^{(2)}_{kn} \\
+        \vdots &  & \ddots & \vdots & \ddots & \vdots \\
+        0 & \dots & a^{(2)}_{nk} & \dots & a^{(2)}_{nn} \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        b^{(1)}_{1} \\
+        b^{(2)}_{2} \\
+        \vdots \\
+        b^{(2)}_{k} \\
+        \vdots \\
+        b^{(2)}_{n} \\
+    \end{bmatrix}
+    $$
+\end{center}
+$k$-ta iteracja:
+\begin{center}
+    $$
+    \begin{bmatrix}
+        a^{(1)}_{11} & \dots & a^{(1)}_{1k} & \dots & a^{(1)}_{1n} \\
+        0 & \dots & a^{(2)}_{2k} & \dots & a^{(2)}_{2n} \\
+        \vdots & \ddots &\vdots & \ddots & \vdots \\
+        0 & \dots & a^{(k)}_{kk} & \dots & a^{(k)}_{kn} \\
+        \vdots & \ddots & \vdots & \ddots & \vdots \\
+        0 &  \dots & a^{(k)}_{nk} -\frac{a^{(k)}_{nk}}{a^{(k)}_{kk}} \cdot a^{(k)}_{kk} & \dots & a^{(k)}_{nn} -\frac{a^{(k)}_{nk}}{a^{(k)}_{kk}} \cdot a^{(k)}_{kn} \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        b^{(1)}_{1} \\
+        b^{(2)}_{2} \\
+        \vdots \\
+        b^{(k)}_{k} \\
+        \vdots \\
+        b^{(k)}_{n} -\frac{a^{(k)}_{nk}}{a^{(k)}_{kk}} \cdot b^{(k)}_{k} \\
+    \end{bmatrix}
+    =
+    $$
+    $$
+    =
+    \begin{bmatrix}
+        a^{(1)}_{11} & \dots & a^{(1)}_{1k} & \dots & a^{(1)}_{1n} \\
+        0 & \dots & a^{(2)}_{2k} & \dots & a^{(2)}_{2n} \\
+        \vdots & \ddots &\vdots & \ddots & \vdots \\
+        0  & \dots & a^{(2)}_{kk} & \dots & a^{(2)}_{kn} \\
+        \vdots &  & \ddots & \vdots & \ddots & \vdots \\
+        0 & \dots & 0 & \dots & a^{(k+1)}_{nn} \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        b^{(1)}_{1} \\
+        b^{(2)}_{2} \\
+        \vdots \\
+        b^{(k)}_{k} \\
+        \vdots \\
+        b^{(k+1)}_{n} \\
+    \end{bmatrix}
+    $$
+\end{center}
+
+Łącznie wykonuje się $n-1$ iteracji.
+
+\subsubsection{Pseudokod eliminacji bez wyboru elementu głównego}
+\begin{algorithm}[H]
+    \SetAlgorithmName{Algorytm}{algorytm}{Lista algorytmów}
+    \KwData{Macierz $A \in \mathbb{R}^{n \times n}$, wektor $b \in \mathbb{R}^{n}$}
+    \KwResult{Macierz $A$ w postaci trójkątnej górnej, wektor $b$ w postaci zmodyfikowanej}
+    \For{$k \leftarrow 1$ \KwTo $n-1$}{
+        \For{$i \leftarrow k+1$ \KwTo $n$}{
+            $\lambda_{ik} \leftarrow -\frac{a^{(k)}_{ik}}{a^{(k)}_{kk}}$\;
+            \For{$j \leftarrow k+1$ \KwTo $n$}{
+                $a^{(k+1)}_{ij} \leftarrow a^{(k)}_{ij} + \lambda_{ik} \cdot a^{(k)}_{kj}$\;
+            }
+            $b^{(k+1)}_{i} \leftarrow b^{(k)}_{i} + \lambda_{ik} \cdot b^{(k)}_{k}$\;
+        }
+    }
+\end{algorithm}
+
+\subsubsection{Pseudokod eliminacji z wyborem elementu głównego}
+\begin{algorithm}[H]
+    \SetAlgorithmName{Algorytm}{algorytm}{Lista algorytmów}
+    \KwData{Macierz $A \in \mathbb{R}^{n \times n}$, wektor $b \in \mathbb{R}^{n}$}
+    \KwResult{Macierz $A$ w postaci trójkątnej górnej, wektor $b$ w postaci zmodyfikowanej}
+    \For{$k \leftarrow 1$ \KwTo $n-1$}{
+        \For{$i \leftarrow k+1$ \KwTo $n$}{
+            \tcp{Wyszukiwanie elementu głównego}
+            $r \leftarrow k$\;
+            \For{$j \leftarrow k+1$ \KwTo $n$}{
+                \If{$|a^{(k)}_{jk}| > |a^{(k)}_{rk}|$}{
+                    $r \leftarrow j$\;
+                }
+            }
+            \If{$r \neq k$}{
+                \tcp{Zamiana wierszy w macierzy}
+                \For{$j \leftarrow k$ \KwTo $n$}{
+                    $t \leftarrow a^{(k)}_{kj}$\;
+                    $a^{(k)}_{kj} \leftarrow a^{(k)}_{rj}$\;
+                    $a^{(k)}_{rj} \leftarrow t$\;
+                }
+                \tcp{Zamiana elementów w wektorze}
+                $t \leftarrow b^{(k)}_{k}$\;
+                $b^{(k)}_{k} \leftarrow b^{(k)}_{r}$\;
+                $b^{(k)}_{r} \leftarrow t$\;
+            }
+
+            $\lambda_{ik} \leftarrow -\frac{a^{(k)}_{ik}}{a^{(k)}_{kk}}$\;
+            \For{$j \leftarrow k+1$ \KwTo $n$}{
+                $a^{(k+1)}_{ij} \leftarrow a^{(k)}_{ij} + \lambda_{ik} \cdot a^{(k)}_{kj}$\;
+            }
+            $b^{(k+1)}_{i} \leftarrow b^{(k)}_{i} + \lambda_{ik} \cdot b^{(k)}_{k}$\;
+        }
+    }
+\end{algorithm}
+
+\subsection{Rozwiązanie układu równań na podstawie macierzy trójkątnej górnej}
+\subsubsection{Opis metody}
+Po przekształceniu macierzy $A$ do postaci trójkątnej górnej, otrzymujemy układ równań w postaci przedstawionej poniżej:
+$$
+\begin{bmatrix}
+    a'_{11} & a'_{12} & \dots & a'_{1k} & \dots & a'_{1n} \\
+    0 & a'_{22} & \dots & a'_{2k} & \dots & a'_{2n} \\
+    \vdots & \vdots & \ddots &\vdots & \ddots & \vdots \\
+    0 & 0 & \dots & a'_{kk} & \dots & a'_{kn} \\
+    \vdots & \vdots & \ddots & \vdots & \ddots & \vdots \\
+    0 & 0 & \dots & 0 & \dots & a'_{nn} \\
+\end{bmatrix}
+\begin{bmatrix}
+    x_{1} \\
+    x_{2} \\
+    \vdots \\
+    x_{k} \\
+    \vdots \\
+    x_{n} \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+    b'_{1} \\
+    b'_{2} \\
+    \vdots \\
+    b'_{k} \\
+    \vdots \\
+    b'_{n} \\
+\end{bmatrix}
+$$
+Rozwiązanie układu równań można znaleźć poprzez podstawienia od końca, czyli:
+$$
+x_n = \frac{b'_n}{a'_{nn}} \qquad \text{oraz} \qquad x_k = \frac{b'_k - \sum_{j=k+1}^{n} a'_{kj} \cdot x_j}{a'_{kk}} \qquad \text{dla} \qquad k = n-1, n-2, \dots, 1
+$$
+\subsubsection{Pseudokod}
+\begin{algorithm}[H]
+    \SetAlgorithmName{Algorytm}{algorytm}{Lista algorytmów}
+    \KwData{Macierz $A \in \mathbb{R}^{n \times n}$ w postaci trójkątnej górnej, wektor $b \in \mathbb{R}^{n}$ w postaci zmodyfikowanej}
+    \KwResult{Wektor $x \in \mathbb{R}^{n}$ będący rozwiązaniem układu równań $Ax = b$}
+    $x_n \leftarrow \frac{b'_n}{a'_{nn}}$\;
+    \For{$k \leftarrow n-1$ \KwTo $1$}{
+        $s \leftarrow 0$\;
+        \For{$j \leftarrow k+1$ \KwTo $n$}{
+            $s \leftarrow s + a'_{kj} \cdot x_j$\;
+        }
+        $x_k \leftarrow \frac{b'_k - s}{a'_{kk}}$\;
+    }
+\end{algorithm}
+
+\subsection{Złożoność obliczeniowa}
+Złożoność obliczeniowa eliminacji wynosi $O(n^3)$, ponieważ w każdej z $n-1$ iteracji należy wykonać $O(n^2)$ operacji - zarówno w wersji z wyborem i bez wybory elementu głównego.
+Złożoność obliczeniowa rozwiązania układu równań na podstawie macierzy trójkątnej górnej wynosi $O(n^2)$, ponieważ w każdej z $n$ iteracji należy wykonać $O(n)$ operacji.
+Zatem łączna złożoność obliczeniowa wynosi $O(n^3)$.
+\subsection{Złożoność pamięciowa}
+Złożoność pamięciowa wynosi $O(n^2)$, ponieważ należy przechowywać macierz $A$, która ma $n^2$ wartości oraz wektor $b$, który ma $n$ wartości.
+
+\section{Rozkład LU}
+Rozkład LU macierzy $A$ jest to rozkład macierzy $A$ na iloczyn macierzy dolnotrójkątnej $L$ oraz macierzy górnotrójkątnej $U$ tak aby $A = LU$.
+\begin{center}
+    $$
+    \begin{bmatrix}
+        a_{11} & a_{12} & \dots & a_{1k} & \dots & a_{1n} \\
+        a_{21} & a_{22} & \dots & a_{2k} & \dots & a_{2n} \\
+        \vdots & \vdots & \ddots &\vdots & \ddots & \vdots \\
+        a_{k1} & a_{k2} & \dots & a_{kk} & \dots & a_{kn} \\
+        \vdots & \vdots & \ddots & \vdots & \ddots & \vdots \\
+        a_{n1} & a_{n2} & \dots & a_{nk} & \dots & a_{nn} \\
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        l_{11} & 0 & \dots & 0 & \dots & 0 \\
+        l_{21} & l_{22} & \dots & 0 & \dots & 0 \\
+        \vdots & \vdots & \ddots &\vdots & \ddots & \vdots \\
+        l_{k1} & l_{k2} & \dots & l_{kk} & \dots & 0 \\
+        \vdots & \vdots & \ddots & \vdots & \ddots & \vdots \\
+        l_{n1} & l_{n2} & \dots & l_{nk} & \dots & l_{nn} \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        u_{11} & u_{12} & \dots & u_{1k} & \dots & u_{1n} \\
+        0 & u_{22} & \dots & u_{2k} & \dots & u_{2n} \\
+        \vdots & \vdots & \ddots &\vdots & \ddots & \vdots \\
+        0 & 0 & \dots & u_{kk} & \dots & u_{kn} \\
+        \vdots & \vdots & \ddots & \vdots & \ddots & \vdots \\
+        0 & 0 & \dots & 0 & \dots & u_{nn} \\
+    \end{bmatrix}
+    $$
+\end{center}
+\subsection{Metoda eliminacji Gaussa a rozkład LU}
+Jeśli przez $L^{(k)}$ oznaczymy macierz, której elementy $l_{ij}$ są współczynnikami używanymi do wyzerowania elementów pod przekątną, tj. $\lambda_{ij}$, to kolejne iteracje algorytmu eliminacji Gaussa można zapisać jako:
+$$
+A^{(k)} = L^{(k)} A^{(k-1)}
+$$
+Wynikiem działania algorytmu eliminacji Gaussa jest macierz trójkątna górna $U$, zatem:
+$$
+U = L^{(n-1)} L^{(n-2)} \dots L^{(1)} A
+$$
+Wynika z tego, że
+$$
+A = (L^{(n-1)} L^{(n-2)} \dots L^{(1)})^{-1} U = L^{(1)^{-1}} L^{(2)^{-1}} \dots L^{(n-1)^{-1}} U = LU,
+$$
+gdzie $L = L^{(1)^{-1}} L^{(2)^{-1}} \dots L^{(n-1)^{-1}}$.
+
+Dodatkowo $L^{(k)}$ ma postać:
+$$
+\begin{bmatrix}
+    1 & & & & & & \\
+    & \ddots & & & & \\
+    & & 1 & & & & \\
+    & & \lambda_{k+1,k} &  & \\
+    & & \lambda_{k+2,k} & & & \\
+    & & \vdots & & \ddots & & \\
+    & & \lambda_{n,k} & & & 1 \\
+\end{bmatrix}
+$$
+
+Z powyższych obserwacji wynika, że:
+\begin{itemize}
+    \item $l_{ij} = \lambda_{i,j}$ dla $i < j$,
+    \item $l_{ij} = 1$ dla $i = j$,
+    \item $u_{ij} = a'_{ij}$ dla $i \geq j$.
+\end{itemize}
+
+\subsection{Trzymanie rozkładu LU w pamięci}
+Rozkład LU można efektywnie trzymać w pamięci poprzez zapisanie macierzy $L$ oraz $U$ w miejscu macierzy $A$.
+Jest to możliwe, ponieważ macierz $L$ jest macierzą dolnotrójkątną, a macierz $U$ jest macierzą górnotrójkątną oraz na przekątnej macierzy $L$ znajdują się same jedynki($l_{ii} = 1$) - nie trzeba ich zatem przechowywać.
+Zatem macierz $LU$ można trzymać w pamięci(jako wynik działania algorytmu eliminacji Gaussa) w postaci:
+\begin{center}
+    $$
+    \begin{bmatrix}
+        a'_{11} & a'_{12} & \dots & a'_{1k} & \dots & a'_{1n} \\
+        \lambda_{21} & a'_{22} & \dots & a'_{2k} & \dots & a'_{2n} \\
+        \vdots & \vdots & \ddots &\vdots & \ddots & \vdots \\
+        \lambda_{k1} & \lambda_{k2} & \dots & a'_{kk} & \dots & a'_{kn} \\
+        \vdots & \vdots & \ddots & \vdots & \ddots & \vdots \\
+        \lambda_{n1} & \lambda_{n2} & \dots & \lambda_{nk} & \dots & a'_{nn} \\
+    \end{bmatrix}
+    $$
+\end{center}
+
+\subsection{Algorytm rozkładu LU}
+Algorytm rozkładu LU jest analogiczny do algorytmu eliminacji Gaussa przedstawionego wcześniej, z tą różnicą, że w każdej iteracji nie wykonuje się operacji na wektorze $b$
+oraz zamiast zapisywania zer pod przekątną w macierzy $A$ zapisuje się współczynniki $\lambda_{ij}$.
+
+\subsection{Złożoność obliczeniowa i pamięciowa wyznaczenia rozkładu LU}
+Złożoność obliczeniowa rozkładu LU jak i złożoność pamięciowa jest taka sama jak w przypadku eliminacji Gaussa, czyli odpowiednio $O(n^3)$ i $O(n^2)$.
+
+\subsection{Rozwiązywanie układu równań na podstawie rozkładu LU}
+Mając rozkład LU macierzy $A$ rozwiązanie układu sprowadza się do rozwiązania dwóch trójkątnych układów równań:
+$$
+Ax = b \iff LUx = b \iff Ly = b \land Ux = y
+$$    
+\begin{center}
+    $$
+    \begin{bmatrix}
+        1 & 0 & \dots & 0 & \dots & 0 \\
+        l_{21} & 1 & \dots & 0 & \dots & 0 \\
+        \vdots & \vdots & \ddots &\vdots & \ddots & \vdots \\
+        l_{k1} & l_{k2} & \dots & 1 & \dots & 0 \\
+        \vdots & \vdots & \ddots & \vdots & \ddots & \vdots \\
+        l_{n1} & l_{n2} & \dots & l_{nk} & \dots & 1 \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        y_{1} \\
+        y_{2} \\
+        \vdots \\
+        y_{k} \\
+        \vdots \\
+        y_{n} \\
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        b_{1} \\
+        b_{2} \\
+        \vdots \\
+        b_{k} \\
+        \vdots \\
+        b_{n} \\
+    \end{bmatrix}
+    $$
+    $$
+    \land
+    $$
+    $$
+    \begin{bmatrix}
+        u_{11} & u_{12} & \dots & u_{1k} & \dots & u_{1n} \\
+        0 & u_{22} & \dots & u_{2k} & \dots & u_{2n} \\
+        \vdots & \vdots & \ddots &\vdots & \ddots & \vdots \\
+        0 & 0 & \dots & u_{kk} & \dots & u_{kn} \\
+        \vdots & \vdots & \ddots & \vdots & \ddots & \vdots \\
+        0 & 0 & \dots & 0 & \dots & u_{nn} \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        x_{1} \\
+        x_{2} \\
+        \vdots \\
+        x_{k} \\
+        \vdots \\
+        x_{n} \\
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        y_{1} \\
+        y_{2} \\
+        \vdots \\
+        y_{k} \\
+        \vdots \\
+        y_{n} \\
+    \end{bmatrix}
+    $$
+\end{center}
+
+W tym przypadku w wariancie z wyborem elementu głównego funkcja rozkładająca macierz $A$ na macierze $L$ i $U$ nie permutuje wektora $b$. 
+Jedynie zwraca wektor permutacji $p$, który musi zostać uwzględniony w wyznaczeniu rozwiązania.
+
+\subsubsection{Złożoność obliczeniowa rozwiązywania układu równań na podstawie rozkładu LU}
+Złożoność obliczeniowa rozwiązywania układu równań na podstawie rozkładu LU wynosi $O(n^2)$, ponieważ należy rozwiązać dwa układy równań trójkątnych, które mają $n$ równań i $n$ niewiadomych.
+\subsubsection{Złożoność pamięciowa rozwiązywania układu równań na podstawie rozkładu LU}
+Złożoność pamięciowa rozwiązywania układu równań na podstawie rozkładu LU wynosi $O(n)$, ponieważ należy przechowywać dodatkowy wektor pomocniczy $y$.
+
+\subsubsection{Pseudokod rozwiązywania układu równań na podstawie rozkładu LU bez wyboru elementu głównego}
+\begin{algorithm}[H]
+    \SetAlgorithmName{Algorytm}{algorytm}{Lista algorytmów}
+    \KwData{Macierz $A \in \mathbb{R}^{n \times n}$ w postaci rozkładu LU, wektor $b \in \mathbb{R}^{n}$}
+    \KwResult{Wektor $x \in \mathbb{R}^{n}$ będący rozwiązaniem układu równań $Ax = b$}
+    \For{$k \leftarrow 1$ \KwTo $n$}{
+        $s \leftarrow 0$\;
+        \For{$j \leftarrow 1$ \KwTo $k-1$}{
+            $s \leftarrow s + l_{kj} \cdot y_j$\;
+        }
+        $y_k \leftarrow b_k - s$\;
+    }
+    \For{$k \leftarrow n$ \KwTo $1$}{
+        $s \leftarrow 0$\;
+        \For{$j \leftarrow k+1$ \KwTo $n$}{
+            $s \leftarrow s + u_{kj} \cdot x_j$\;
+        }
+        $x_k \leftarrow \frac{y_k - s}{u_{kk}}$\;
+    }
+\end{algorithm}
+
+\subsubsection{Pseudokod rozwiązywania układu równań na podstawie rozkładu LU z wyborem elementu głównego}
+\begin{algorithm}[H]
+    \SetAlgorithmName{Algorytm}{algorytm}{Lista algorytmów}
+    \KwData{Macierz $A \in \mathbb{R}^{n \times n}$ w postaci rozkładu LU, wektor $b \in \mathbb{R}^{n}$, wektor permutacji $p \in \mathbb{N}^{n}$}
+    \KwResult{Wektor $x \in \mathbb{R}^{n}$ będący rozwiązaniem układu równań $Ax = b$}
+    \For{$k \leftarrow 1$ \KwTo $n$}{
+        $s \leftarrow 0$\;
+        \For{$j \leftarrow 1$ \KwTo $k-1$}{
+            $s \leftarrow s + l_{kj} \cdot y_j$\;
+        }
+        $k' \leftarrow p[k]$\;
+        $y_k \leftarrow b_{k'} - s$\;
+    }
+    \For{$k \leftarrow n$ \KwTo $1$}{
+        $s \leftarrow 0$\;
+        \For{$j \leftarrow k+1$ \KwTo $n$}{
+            $s \leftarrow s + u_{kj} \cdot x_j$\;
+        }
+        $x_k \leftarrow \frac{y_k - s}{u_{kk}}$\;
+    }
+\end{algorithm}
+
+\subsection{Zalety użycia rozkładu LU}
+Rozkład LU można wykorzystać do rozwiązywania układów równań z macierzą $A$ o tej samej postaci, ale innym wektorem prawych stron $b$.
+Wówczas mając $p$ różnych wektorów prawych stron złożoność obliczeniowa spada z $O(pn^3)$ do $O(n^3)$, ponieważ rozkład macierzy $A$ na macierze $L$ i $U$ wykonuje się tylko raz.
+
+\section{Dostosowywanie algorytmu eliminacji Gaussa i rozkładu LU}
+Jeśli macierz $A$ jest rzadka i ma specjaną strukturę, to można dostosować algorytm eliminacji Gaussa i rozkładu LU do tej struktury aby zmniejszyć złożoność obliczeniową i pamięciową.
+
+\subsection{Struktura macierzy}
+Rozpatrywana macierz $A$ ma postać:
+\begin{center}
+    $$
+    \begin{bmatrix}
+        A_1 & C_1 & \textbf{0} & \textbf{0} & \textbf{0} & \dots & \textbf{0} \\
+        B_2 & A_2 & C_2 & \textbf{0} & \textbf{0} & \dots & \textbf{0} \\
+        \textbf{0} & B_3 & A_3 & C_3 & \textbf{0} & \dots & \textbf{0} \\
+        \vdots & \ddots & \ddots & \ddots & \ddots & \ddots & \vdots \\
+        \textbf{0} & \dots & \textbf{0} & B_{v-2} & A_{v-2} & C_{v-2} & \textbf{0} \\
+        \textbf{0} & \dots & \textbf{0} & \textbf{0} & B_{v-1} & A_{v-1} & C_{v-1} \\
+        \textbf{0} & \dots & \textbf{0} & \textbf{0} & \textbf{0} & B_v & A_v \\
+    \end{bmatrix},
+    $$
+\end{center}
+gdzie $n, l, v \in \mathbb{N}$, $v = \frac{n}{l}$, $A_k \in \mathbb{R}^{l \times l}$ dla $k = 1, ..., v$, $B_k \in \mathbb{R}^{l \times l}$ dla $k = 2, ..., v$, $C_k \in \mathbb{R}^{l \times l}$ dla $k = 1, ..., v-1$.
+
+Postacie macierzy składowych:
+\begin{center}
+    $$
+    A_k = 
+    \begin{bmatrix}
+        a^{(k)}_{11} & a^{(k)}_{12} & \dots & a^{(k)}_{1l} \\
+        a^{(k)}_{21} & a^{(k)}_{22} & \dots & a^{(k)}_{2l} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        a^{(k)}_{l1} & a^{(k)}_{l2} & \dots & a^{(k)}_{ll} \\
+    \end{bmatrix},
+    \qquad
+    B_k = 
+    \begin{bmatrix}
+        0 & \dots & \dots & b^{(k)}_{1l} \\
+        0 & \dots & \dots & b^{(k)}_{2l} \\
+        \vdots & \ddots & \ddots & \vdots \\
+        0 & \dots & \dots & b^{(k)}_{ll} \\
+    \end{bmatrix},
+    \qquad
+    C_k = 
+    \begin{bmatrix}
+        c^{(k)}_{11} & 0 & \dots & 0 \\
+        0 & c^{(k)}_{22} & \dots & 0\\
+        \vdots & \ddots & \ddots & \vdots \\
+        0 & \dots & 0 & c^{(k)}_{ll} \\
+    \end{bmatrix}
+    $$
+\end{center}
+
+\subsubsection{Realizacja struktury macierzy dla wersji bez wyboru elementu głównego}
+Można łatwo zauważyć, że większość macierzy pod przekątną jest wyzerowana. Zatem można pamiętać mniej wartości co przełoży się na mniejszą złożoność pamięciową.
+Na rysunku poniżej zaznaczono elementy macierzy, które są niezerowe lub staną się niezerowe w trakcie działania algorytmu eliminacji Gaussa.
+Zera pod przekątnymi macierzy $C_k$ staną się niezerowe, ponieważ w trakcie eliminacji Gaussa od wiersza $i$ odejmowany jest poprzedni wiersz, który w kolumnie gdzie wiersz $i$ ma zera ma niezerową wartość.
+Zerowe elementy w macierzy $B_k$ zostaną zerowe, ponieważ odejmowany wiersz ma już wyzerowane kolumny o indeksach mniejszych niż $i$.
+
+\begin{center}
+    $$
+    \setcounter{MaxMatrixCols}{16}
+    \begin{bNiceMatrix}
+        \Block[draw=blue!30,fill=blue!5,rounded-corners]{1-5}{} a^{(1)}_{11} & a^{(1)}_{12} & a^{(1)}_{13} & a^{(1)}_{14} & c^{(1)}_{11} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\
+        \Block[draw=blue!30,fill=blue!5,rounded-corners]{1-6}{} a^{(1)}_{21} & a^{(1)}_{22} & a^{(1)}_{23} & a^{(1)}_{24} & 0 & c^{(1)}_{22} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\
+        \Block[draw=blue!30,fill=blue!5,rounded-corners]{1-7}{} a^{(1)}_{31} & a^{(1)}_{32} & a^{(1)}_{33} & a^{(1)}_{34} & 0 & 0 & c^{(1)}_{33} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\
+        \Block[draw=blue!30,fill=blue!5,rounded-corners]{1-8}{} a^{(1)}_{41} & a^{(1)}_{42} & a^{(1)}_{43} & a^{(1)}_{44} & 0 & 0 & 0 & c^{(1)}_{44} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\
+        0 & 0 & 0 & \Block[draw=blue!30,fill=blue!5,rounded-corners]{1-6}{} b^{(2)}_{14} & a^{(2)}_{11} & a^{(2)}_{12} & a^{(2)}_{13} & a^{(2)}_{14} & c^{(2)}_{11} & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\
+        0 & 0 & 0 & \Block[draw=blue!30,fill=blue!5,rounded-corners]{1-7}{} b^{(2)}_{24} & a^{(2)}_{21} & a^{(2)}_{22} & a^{(2)}_{23} & a^{(2)}_{24} & 0 & c^{(2)}_{22} & 0 & 0 & 0 & 0 & 0 & 0  \\
+        0 & 0 & 0 & \Block[draw=blue!30,fill=blue!5,rounded-corners]{1-8}{} b^{(2)}_{34} & a^{(2)}_{31} & a^{(2)}_{32} & a^{(2)}_{33} & a^{(2)}_{34} & 0 & 0 & c^{(2)}_{33} & 0 & 0 & 0 & 0 & 0  \\
+        0 & 0 & 0 & \Block[draw=blue!30,fill=blue!5,rounded-corners]{1-9}{} b^{(2)}_{44} & a^{(2)}_{41} & a^{(2)}_{42} & a^{(2)}_{43} & a^{(2)}_{44} & 0 & 0 & 0 & c^{(2)}_{44} & 0 & 0 & 0 & 0  \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & \Block[draw=blue!30,fill=blue!5,rounded-corners]{1-6}{} b^{(3)}_{14} & a^{(3)}_{11} & a^{(3)}_{12} & a^{(3)}_{13} & a^{(3)}_{14} & c^{(3)}_{11} & 0 & 0 & 0  \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & \Block[draw=blue!30,fill=blue!5,rounded-corners]{1-7}{} b^{(3)}_{24} & a^{(3)}_{21} & a^{(3)}_{22} & a^{(3)}_{23} & a^{(3)}_{24} & 0 & c^{(3)}_{22} & 0 & 0  \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & \Block[draw=blue!30,fill=blue!5,rounded-corners]{1-8}{} b^{(3)}_{34} & a^{(3)}_{31} & a^{(3)}_{32} & a^{(3)}_{33} & a^{(3)}_{34} & 0 & 0 & c^{(3)}_{33} & 0  \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & \Block[draw=blue!30,fill=blue!5,rounded-corners]{1-9}{} b^{(3)}_{44} & a^{(3)}_{41} & a^{(3)}_{42} & a^{(3)}_{43} & a^{(3)}_{44} & 0 & 0 & 0 & c^{(3)}_{44}  \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \Block[draw=blue!30,fill=blue!5,rounded-corners]{1-5}{} b^{(4)}_{14} & a^{(4)}_{11} & a^{(4)}_{12} & a^{(4)}_{13} & a^{(4)}_{14}  \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \Block[draw=blue!30,fill=blue!5,rounded-corners]{1-5}{} b^{(4)}_{24} & a^{(4)}_{21} & a^{(4)}_{22} & a^{(4)}_{23} & a^{(4)}_{24}  \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \Block[draw=blue!30,fill=blue!5,rounded-corners]{1-5}{} b^{(4)}_{34} & a^{(4)}_{31} & a^{(4)}_{32} & a^{(4)}_{33} & a^{(4)}_{34}  \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \Block[draw=blue!30,fill=blue!5,rounded-corners]{1-5}{} b^{(4)}_{44} & a^{(4)}_{41} & a^{(4)}_{42} & a^{(4)}_{43} & a^{(4)}_{44}  \\
+    \end{bNiceMatrix}
+    $$
+\end{center}
+
+\subsubsection{Realizacja struktury macierzy dla wersji z wyborem elementu głównego}
+W tym przypadku liczba niezerowych elementów jest większa, ponieważ w każdej iteracji algorytmu eliminacji Gaussa wybierany jest element główny, który może znajdować się w jednym z wierszy poniżej.
+Z tego powodu koniec wiersza z niezerowymi elementami równy jest najdalszemu końcowi jednego z wierszy poniżej z niezerowymi wartościami w danej kolumnie.
+W macierzy $B_k$ nie pojawią się żadne nowe niezerowe elementy, ponieważ odpowiednie kolumny w wierszach powyżej są już wyzerowane.
+Przedstawia to rysunek poniżej.
+
+\begin{center}
+    $$
+    \setcounter{MaxMatrixCols}{16}
+    \begin{bNiceMatrix}
+        \Block[draw=blue!30,fill=blue!5,rounded-corners]{4-8}{}
+        a^{(1)}_{11} & a^{(1)}_{12} & a^{(1)}_{13} & a^{(1)}_{14} & c^{(1)}_{11} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\
+        a^{(1)}_{21} & a^{(1)}_{22} & a^{(1)}_{23} & a^{(1)}_{24} & 0 & c^{(1)}_{22} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\
+        a^{(1)}_{31} & a^{(1)}_{32} & a^{(1)}_{33} & a^{(1)}_{34} & 0 & 0 & c^{(1)}_{33} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\
+        a^{(1)}_{41} & a^{(1)}_{42} & a^{(1)}_{43} & \Block[draw=blue!30,fill=blue!5,rounded-corners]{5-9}{} a^{(1)}_{44} & 0 & 0 & 0 & c^{(1)}_{44} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\
+        0 & 0 & 0 & b^{(2)}_{14} & a^{(2)}_{11} & a^{(2)}_{12} & a^{(2)}_{13} & a^{(2)}_{14} & c^{(2)}_{11} & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\
+        0 & 0 & 0 & b^{(2)}_{24} & a^{(2)}_{21} & a^{(2)}_{22} & a^{(2)}_{23} & a^{(2)}_{24} & 0 & c^{(2)}_{22} & 0 & 0 & 0 & 0 & 0 & 0  \\
+        0 & 0 & 0 & b^{(2)}_{34} & a^{(2)}_{31} & a^{(2)}_{32} & a^{(2)}_{33} & a^{(2)}_{34} & 0 & 0 & c^{(2)}_{33} & 0 & 0 & 0 & 0 & 0  \\
+        0 & 0 & 0 & b^{(2)}_{44} & a^{(2)}_{41} & a^{(2)}_{42} & a^{(2)}_{43} & \Block[draw=blue!30,fill=blue!5,rounded-corners]{5-9}{} a^{(2)}_{44} & 0 & 0 & 0 & c^{(2)}_{44} & 0 & 0 & 0 & 0  \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & b^{(3)}_{14} & a^{(3)}_{11} & a^{(3)}_{12} & a^{(3)}_{13} & a^{(3)}_{14} & c^{(3)}_{11} & 0 & 0 & 0  \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & b^{(3)}_{24} & a^{(3)}_{21} & a^{(3)}_{22} & a^{(3)}_{23} & a^{(3)}_{24} & 0 & c^{(3)}_{22} & 0 & 0  \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & b^{(3)}_{34} & a^{(3)}_{31} & a^{(3)}_{32} & a^{(3)}_{33} & a^{(3)}_{34} & 0 & 0 & c^{(3)}_{33} & 0  \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & b^{(3)}_{44} & a^{(3)}_{41} & a^{(3)}_{42} & a^{(3)}_{43} & \Block[draw=blue!30,fill=blue!5,rounded-corners]{5-5}{} a^{(3)}_{44} & 0 & 0 & 0 & c^{(3)}_{44}  \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & b^{(4)}_{14} & a^{(4)}_{11} & a^{(4)}_{12} & a^{(4)}_{13} & a^{(4)}_{14}  \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & b^{(4)}_{24} & a^{(4)}_{21} & a^{(4)}_{22} & a^{(4)}_{23} & a^{(4)}_{24}  \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & b^{(4)}_{34} & a^{(4)}_{31} & a^{(4)}_{32} & a^{(4)}_{33} & a^{(4)}_{34}  \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & b^{(4)}_{44} & a^{(4)}_{41} & a^{(4)}_{42} & a^{(4)}_{43} & a^{(4)}_{44}  \\        
+    \end{bNiceMatrix}
+    $$
+\end{center}
+
+\subsection{Optymalizacja algorytmu eliminacji Gaussa i rozkładu LU}
+\subsubsection{Algorytm eliminacji Gaussa}
+Na podstawie opisu algorytmu w sekcji 2.1 można łatwo zaadaptować algorytm eliminacji Gaussa do specyficznej struktury macierzy $A$:
+\begin{enumerate}
+    \item Całkowita liczba iteracji algorytmu się nie zmieni, ponieważ liczba równań jest taka sama.
+    \item W każdej iteracji $k$ eliminowana była zmienna z wierszy $i = k+1, k+2, ..., n$. W tym przypadku wystarczy zrobić to dla wierszy $i = k+1, k+2, ..., k'$, gdzie $k'$ jest liczbą potencjalnie niezerowych elementów w kolumnie $k$.
+    \item W celu eliminacji zmiennej z wierszy $i = k+1, k+2, ..., k'$ należy odjąć odpowiednie przeskalowany wiersz $k$ od wierszy o indeksach $i$. 
+    W wersji podstawowej odejmowane były kolumny od $k+1$ do $n$, a w tym przypadku wystarczy odjąć kolumny od $k+1$ do $k''$, gdzie $k''$ jest indeksem najdalszego potencjalnie niezerowego elementu w wierszu $k$.
+    \item W trakcie szukania elementu głównego można ograniczyć się do wierszy $i = k, k+1, ..., k'$.
+    \item Podczas zamiany wierszy można się ograniczyć do kolumn $j = k, k+1, ..., k''$.
+\end{enumerate}
+
+\subsubsection{Algorytm wyznaczania rozwiązania układu równań}
+Na podstawie opisu algorytmu w sekcji 2.2 można łatwo zaadaptować algorytm wyznaczania rozwiązania układu równań trójkątnych do specyficznej struktury macierzy $A$:
+\begin{enumerate}
+    \item Całkowita liczba iteracji algorytmu się nie zmieni, ponieważ liczba równań jest taka sama.
+    \item W każdej iteracji można ograniczyć liczbę kolumn, które są sumowane korzystając z ograniczenia na indeks najdalszego potencjalnie niezerowego elementu w wierszu - $k''$.
+\end{enumerate}
+
+\subsection{Złożoność dostosowanego algorytmu eliminacji Gaussa i rozkładu LU}
+
+\subsubsection{Złożoność obliczeniowa}
+W każdej z $n-1$ iteracji algorytmu eliminowania kolejnych zmiennych każda zmienna jest eliminowana z maksymalnie $l$ wierszy.
+W celu jej eliminacji należy odjąć wartości od maksymalnie $l$ kolumn w wersji bez wyboru elementu głównego oraz maksymalnie $2l$ kolumn w wersji z wyborem elementu głównego.
+Wynika z tego, że złożoność tego etapu wynosi $O(l^2n)$. 
+W celu wyznaczenia rozwiązania układu równań trójkątnych w każdej z $n$ iteracji należy wykonać maksymalnie $O(l)$ operacji.
+Ponieważ $l$ jest ustaloną stałą, to złożoność obliczeniowa obu powyższych etapów w obu wersjach wynosi $O(n)$.
+
+\subsubsection{Złożoność pamięciowa bez wyboru elementu głównego}
+\begin{enumerate}
+    \item Każda z $v$ reprezentacji macierzy $A_k$ potrzebuje $l^2$ liczb do jej zapisania.
+    \item Każda z $v-1$ reprezentacji macierzy $B_k$ potrzebuje $l$ liczb do jej zapisania.
+    \item Każda z $v-1$ reprezentacji macierzy $C_k$ potrzebuje $\frac{l \cdot (l+1)}{2}$ liczb do jej zapisania.
+\end{enumerate}
+Sumarycznie złożoność pamięciowa wynosi $O(ln)$, a ponieważ $l$ jest ustaloną stałą, to mamy $O(n)$.
+
+\subsubsection{Złożoność pamięciowa z wyborem elementu głównego}
+\begin{enumerate}
+    \item Każda z $v$ reprezentacji macierzy $A_k$ potrzebuje $l^2$ liczb do jej zapisania.
+    \item Każda z $v-1$ reprezentacji macierzy $B_k$ potrzebuje $l$ liczb do jej zapisania.
+    \item Każda z $v-1$ reprezentacji macierzy $C_k$ potrzebuje $l^2$ liczb do jej zapisania.
+    \item Dodatkowe niezerowe elementy powstałe w wyniku zamiany wierszy potrzebują $O(l)$ liczb do ich zapisania.
+    \item Wektor permutacji $p$ potrzebuje $n$ liczb do jego zapisania.
+\end{enumerate}
+Sumarycznie złożoność pamięciowa wynosi $O(ln)$, a ponieważ $l$ jest ustaloną stałą, to mamy $O(n)$.
+
+\subsection{Szczegóły implementacyjne}
+\begin{enumerate}
+    \item Dla metod bez wyboru i z wyborem elementu głównego zapewniono osobne implementacje struktury macierzy $A$.
+    \item Macierz $A$ zapamiętywana jest w postaci wektora $n$ wektorów o długościach równych liczbie potencjalnie niezerowych elementów wiersza.
+    \item Funkcja znajdująca rozkład $LU$ macierzy $A$ nadpisuje macierz $A$ macierzami $L$ i $U$.
+    \item Funkcja znajdująca rozład $LU$ macierzy $A$ z wyborem elementu głównego zwraca wektor permutacji $p$, który musi zostać uwzględniony podczas wyznaczania rozwiązania układu równań.
+    \item W implementacji zapewnio możliwość wybory precyzji liczb zmiennoprzecinkowych.
+    \item Zaimplementowano funckję rozwiązującą układ równań na podstawie danych $A$ i $b$, funkcję która rozkłada macierz $A$ na macierze $L$ i $U$ oraz funkcję która na podstawie rozkładu $LU$ oraz wektora $b$ wyznacza rozwiązanie układu równań.
+        Każda z tych funkcji wspiera wersję bez wyboru elementu głównego oraz z wyborem elementu głównego.
+\end{enumerate}
+
+\subsection{Pseudokod}
+\subsubsection{Jak wyznaczyć zakres wierszy z niezerowymi elementami w danej kolumnie?}
+\begin{algorithm}[H]
+    \SetAlgorithmName{Algorytm}{algorytm}{Lista algorytmów}
+    \KwData{Parametry macierzy(bez wyboru elementu głównego) $n,l \in \mathbb{N}$, numer kolumny $col \in \mathbb{N}$}
+    \KwResult{Zakres wierszy $k'_{1B}, k'_{1T}$ z niezerowymi elementami w kolumnie $k$}
+    $k \leftarrow div(col-1,l)$\;
+    \Return{$\max(1, col - l), \min(n, (k + 1) * l)$}\;
+\end{algorithm}
+
+\begin{algorithm}
+    \SetAlgorithmName{Algorytm}{algorytm}{Lista algorytmów}
+    \KwData{Parametry macierzy(z wyborem elementu głównego) $n,l \in \mathbb{N}$, numer kolumny $col \in \mathbb{N}$}
+    \KwResult{Zakres wierszy $k'_{2B}, k'_{2T}$ z niezerowymi elementami w kolumnie $k$}
+    $k_1 \leftarrow div(col - l - 1, l)$\;
+    $k_2 \leftarrow div(col,l)$\;
+    \Return{$\max(1, k_1 * l), min(n, (k_2 + 1) * l)$}\;
+\end{algorithm}
+    
+\subsubsection{Jak wyznaczyć zakres kolumn z niezerowymi elementami w danym wierszu?}
+\begin{algorithm}[H]
+    \SetAlgorithmName{Algorytm}{algorytm}{Lista algorytmów}
+    \KwData{Parametry macierzy(bez wyboru elementu głównego) $n,l \in \mathbb{N}$, numer wiersza $row \in \mathbb{N}$}
+    \KwResult{Zakres kolumn $k^{''}_{1B}, k^{''}_{1T}$ z niezerowymi elementami w wierszu $row$}
+    $k \leftarrow div(row-1,l)$\;
+    \Return{$\max(1, k * l), \min(n, row + l)$}\;
+\end{algorithm}
+
+\begin{algorithm}
+    \SetAlgorithmName{Algorytm}{algorytm}{Lista algorytmów}
+    \KwData{Parametry macierzy(z wyborem elementu głównego) $n,l \in \mathbb{N}$, numer wiersza $row \in \mathbb{N}$}
+    \KwResult{Zakres kolumn $k^{''}_{2B}, k^{''}_{2T}$ z niezerowymi elementami w wierszu $row$}
+    $k_1 \leftarrow div(row-1,l)$\;
+    $k_2 \leftarrow div(row,l)$\;
+    \Return{$\max(1, k_1 * l), min(n, (k_2 + 2) * l)$}\;
+\end{algorithm}
+
+\subsubsection{Rozkład LU macierzy $A$ bez wyboru elementu głównego}
+\begin{algorithm}[H]
+    \SetAlgorithmName{Algorytm}{algorytm}{Lista algorytmów}
+    \KwData{Macierz $A \in \mathbb{R}^{n \times n}$, wektor $b \in \mathbb{R}^{n}$}
+    \KwResult{Macierz $A$ przekształcona w rozkład $LU$}
+    \For{$k \leftarrow 1$ \KwTo $n-1$}{
+        \For{$i \leftarrow k+1$ \KwTo $k^{''}_{1T}$}{
+            $\lambda_{ik} \leftarrow -\frac{a^{(k)}_{ik}}{a^{(k)}_{kk}}$\;
+            \For{$j \leftarrow k+1$ \KwTo $k^{'}_{1T}$}{
+                $a^{(k+1)}_{ij} \leftarrow a^{(k)}_{ij} + \lambda_{ik} \cdot a^{(k)}_{kj}$\;
+            }
+            $b^{(k+1)}_{i} \leftarrow b^{(k)}_{i} + \lambda_{ik} \cdot b^{(k)}_{k}$\;
+        }
+    }
+\end{algorithm}
+\subsubsection{Rozkład LU macierzy $A$ z wyborem elementu głównego}
+\begin{algorithm}[H]
+    \SetAlgorithmName{Algorytm}{algorytm}{Lista algorytmów}
+    \KwData{Macierz $A \in \mathbb{R}^{n \times n}$, wektor $b \in \mathbb{R}^{n}$}
+    \KwResult{Macierz $A$ przekształcona w rozkład $LU$, wektor permutacji $p$}
+    $p \leftarrow [1, 2, ..., n]$\;
+    \For{$k \leftarrow 1$ \KwTo $n-1$}{
+        \For{$i \leftarrow k+1$ \KwTo $k{''}_{2T}$}{
+            \tcp{Wyszukiwanie elementu głównego}
+            $r \leftarrow k$\;
+            \For{$j \leftarrow k+1$ \KwTo $k^{'}_{2T}$}{
+                \If{$|a^{(k)}_{jk}| > |a^{(k)}_{rk}|$}{
+                    $r \leftarrow j$\;
+                }
+            }
+            \If{$r \neq k$}{
+                \tcp{Zamiana wektora permutacji}
+                $t \leftarrow p_k$\;
+                $p_k \leftarrow p_r$\;
+                $p_r \leftarrow t$\;
+                \tcp{Zamiana wierszy w macierzy}
+                \For{$j \leftarrow k$ \KwTo $k^{'}_{2T}$}{
+                    $t \leftarrow a^{(k)}_{kj}$\;
+                    $a^{(k)}_{kj} \leftarrow a^{(k)}_{rj}$\;
+                    $a^{(k)}_{rj} \leftarrow t$\;
+                }
+            }
+
+            $\lambda_{ik} \leftarrow -\frac{a^{(k)}_{ik}}{a^{(k)}_{kk}}$\;
+            \For{$j \leftarrow k+1$ \KwTo $k^{'}_{2T}$}{
+                $a^{(k+1)}_{ij} \leftarrow a^{(k)}_{ij} + \lambda_{ik} \cdot a^{(k)}_{kj}$\;
+            }
+            $a^{(k+1)}_{ik} \leftarrow \lambda_{ik}$\;
+        }
+    }
+\end{algorithm}
+\subsubsection{Rozwiązanie układu równań na podstawie rozkładu LU macierzy $A$ bez wyboru elementu głównego}
+\begin{algorithm}[H]
+    \SetAlgorithmName{Algorytm}{algorytm}{Lista algorytmów}
+    \KwData{Macierz $A \in \mathbb{R}^{n \times n}$ w postaci rozkładu LU, wektor $b \in \mathbb{R}^{n}$}
+    \KwResult{Wektor $x \in \mathbb{R}^{n}$ będący rozwiązaniem układu równań $Ax = b$}
+    \For{$k \leftarrow 1$ \KwTo $n$}{
+        $s \leftarrow 0$\;
+        \For{$j \leftarrow k'_{1B}$ \KwTo $k-1$}{
+            $s \leftarrow s + l_{kj} \cdot y_j$\;
+        }
+        $y_k \leftarrow b_k - s$\;
+    }
+    \For{$k \leftarrow n$ \KwTo $1$}{
+        $s \leftarrow 0$\;
+        \For{$j \leftarrow k+1$ \KwTo $k'_{1T}$}{
+            $s \leftarrow s + u_{kj} \cdot x_j$\;
+        }
+        $x_k \leftarrow \frac{y_k - s}{u_{kk}}$\;
+    }
+\end{algorithm}
+
+\subsubsection{Rozwiązanie układu równań na podstawie rozkładu LU macierzy $A$ z wyborem elementu głównego}
+\begin{algorithm}[H]
+    \SetAlgorithmName{Algorytm}{algorytm}{Lista algorytmów}
+    \KwData{Macierz $A \in \mathbb{R}^{n \times n}$ w postaci rozkładu LU, wektor $b \in \mathbb{R}^{n}$, wektor permutacji $p \in \mathbb{N}^{n}$}
+    \KwResult{Wektor $x \in \mathbb{R}^{n}$ będący rozwiązaniem układu równań $Ax = b$}
+    \For{$k \leftarrow 1$ \KwTo $n$}{
+        $s \leftarrow 0$\;
+        \For{$j \leftarrow k'_{2B}$ \KwTo $k-1$}{
+            $s \leftarrow s + l_{kj} \cdot y_j$\;
+        }
+        $k' \leftarrow p[k]$\;
+        $y_k \leftarrow b_{k'} - s$\;
+    }
+    \For{$k \leftarrow n$ \KwTo $1$}{
+        $s \leftarrow 0$\;
+        \For{$j \leftarrow k+1$ \KwTo $k'_{2T}$}{
+            $s \leftarrow s + u_{kj} \cdot x_j$\;
+        }
+        $x_k \leftarrow \frac{y_k - s}{u_{kk}}$\;
+    }
+\end{algorithm}
+
+\newpage
+
+\section{Wyniki eksperymentalne}
+
+\end{document}
